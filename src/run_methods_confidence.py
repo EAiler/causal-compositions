@@ -189,6 +189,8 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
             title_all.append(title)
             logging.info(f"")
         except:
+            mse_all.append(np.array([np.inf]))
+            beta_all.append(np.array([np.nan] * (p-1)))
             logging.info(f"No solution for " + str(title))
 
 
