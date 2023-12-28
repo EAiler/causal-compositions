@@ -166,8 +166,13 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
             title_all.append(title)
             logging.info(f"")
         except:
-            mse_all.append(np.array([np.inf]))
-            beta_all.append(np.array([np.nan] * (p-1)))
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
             logging.info(f"No solution for " + str(title))
 
     # NO REGRESSION LOG CONTRAST REGRESSION
@@ -189,8 +194,6 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
             title_all.append(title)
             logging.info(f"")
         except:
-            mse_all.append(np.array([np.inf]))
-            beta_all.append(np.array([np.nan] * (p-1)))
             logging.info(f"No solution for " + str(title))
 
 
@@ -612,6 +615,7 @@ def main(_):
                                                                   kernel_alpha=FLAGS.kernel_alpha,
                                                                   method_selection=FLAGS.selected_methods)
         # Save methods in dictionary
+        logging.info(f"Append Results.")
         beta_confidence.append(beta_all)
         mse_confidence.append(mse_all)
         title_confidence.append(title_all)
@@ -621,6 +625,7 @@ def main(_):
         # ---------------------------------------------------------------------------
         # 4. Aggregation of Results
         # ---------------------------------------------------------------------------
+        logging.info(f"Aggregate Results.")
         V = cmp._gram_schmidt_basis(p)
         flatten = lambda t: [item for sublist in t for item in sublist]
         title_all = flatten(title_confidence)
@@ -638,7 +643,7 @@ def main(_):
                 mse_dict.update({title_all[i]: np.append(value, np.nan)})
 
         logging.info(mse_dict)
-
+        
         df_mse = pd.DataFrame(mse_dict)
         df_mse.dropna(axis=1, inplace=True)
         cat_order = df_mse.mean().sort_values().index
