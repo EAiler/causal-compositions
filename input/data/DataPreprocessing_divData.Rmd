@@ -1,0 +1,110 @@
+---
+title: "Data Preprocessing for One Dimensional Setup"
+output: html_document
+date: '2023-12-28'
+---
+
+
+```{r setup, include=FALSE}
+reqpkg = c("reshape2", "cluster", "doParallel", "foreach", 
+           "ggplot2", "grid", "scales", "phyloseq", "plyr", "tidyr", 
+           "breakaway", "DivNet", "tidyverse")
+# Load all required packages and show version
+for(i in reqpkg){
+	print(i); print(packageVersion(i))
+	library(i, quietly=TRUE, verbose=FALSE, warn.conflicts=FALSE, character.only=TRUE)
+}
+```
+
+# One Dimensional Setup
+
+```{r data loading}
+load("genus.Rdata")
+load("phy.Rdata")
+bodyweight=read.csv("FinalBodyWeight.csv")
+phy.genus <- phy.norm
+
+```
+
+## Filter datasets
+
+```{r Aggregation of data}
+
+agg_level = "Class"
+day = "Day_21"
+no_filter = ""
+
+phy.sub = phy.genus %>%
+  subset_samples(Timepoint%in%c(day)) 
+
+
+if (no_filter == ""){
+  phy.sub <- filter_taxa(phy.sub, function(x) mean(x) > 1, TRUE)
+}
+
+
+phy.org <- phy.sub
+shannon_div <- tax_glom(phy.sub, taxrank = agg_level) %>%
+  estimate_richness(measures = "Shannon")
+
+simpson_div <- tax_glom(phy.sub, taxrank = agg_level) %>%
+  estimate_richness(measures = "Simpson")
+```
+
+
+```{r}
+org.data <- t(otu_table(phy.sub))
+
+sam <- sample_data(phy.sub)
+sam.2<-as.data.frame(slot(sam,".Data"))
+colnames(sam.2)<-colnames(sam)
+sam.incl.weight <- merge(sam.2, bodyweight, by.x="MouseID", by.y="Sample.ID")
+sam.weight <- sam.incl.weight[c("X.SampleID", "weight")]
+sam.weight <- sam.weight %>% remove_rownames %>% column_to_rownames(var="X.SampleID")
+
+analysis_data <- merge(org.data, sam.weight, by=0)
+
+# filter treatment data
+treatment_data <- sam.2[c("X.SampleID", "Treatment")]
+rownames(treatment_data) <- treatment_data[,1]
+
+rownames(analysis_data) <- analysis_data[,1]
+analysis_data <- analysis_data[,-1]
+
+# merge with simpson div
+analysis_data <- merge(simpson_div, analysis_data, by=0)
+rownames(analysis_data) <- analysis_data[,1]
+analysis_data <- analysis_data[,-1]
+
+# merge with shannon div
+analysis_data <- merge(shannon_div, analysis_data, by=0)
+rownames(analysis_data) <- analysis_data[,1]
+analysis_data <- analysis_data[,-1]
+
+# merge with treatment data
+analysis_data <- merge(treatment_data, analysis_data, by=0)
+rownames(analysis_data) <- analysis_data[,1]
+analysis_data <- analysis_data[,-1]
+```
+
+## Save Data for Analysis
+
+```{r}
+suffix = paste0(agg_level, "_231228")
+write.csv(analysis_data,
+            paste0("/Users/elisabeth.ailer/Projects/P1_Microbiom/Code/input/data/divData_",no_filter, "_", day, "_", suffix, ".csv"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
