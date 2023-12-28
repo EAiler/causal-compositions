@@ -398,9 +398,9 @@ def sim_IV_ilr_nonlinear(key,
     _, X_star, X_star_ilr, _ = sim_FS_ilr_linear(key, num_star, p, num_inst,
                                                  mu_c, alpha0, alphaT, c_X)
 
-    Y_star = beta0 + 1/10*(X_star_ilr @ betaT) + 1/20*((X_star_ilr+1) ** 3 @ np.ones(p - 1, )) + c_Y * mu_c
+    #Y_star = beta0 + 1/10*(X_star_ilr @ betaT) + 1/20*((X_star_ilr+1) ** 3 @ np.ones(p - 1, )) + c_Y * mu_c
     # best so far
-    #Y_star = beta0 + 1 / 10 * ((X_star_ilr + 1) ** 2 @ np.ones(p - 1, )) + c_Y * mu_c
+    Y_star = beta0 + 1 / 10 * ((X_star_ilr + 1) ** 2 @ np.ones(p - 1, )) + c_Y * mu_c
 
     return confounder, Z_sim, X_sim, Y_sim, X_star, Y_star
 
