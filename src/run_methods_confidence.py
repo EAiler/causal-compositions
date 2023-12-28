@@ -194,6 +194,13 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
             title_all.append(title)
             logging.info(f"")
         except:
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
             logging.info(f"No solution for " + str(title))
 
 
@@ -218,7 +225,14 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
                 title_all.append(title)
                 logging.info(f"")
             except:
-                logging.info(f"No solution found for Dirichlet Regression")
+                mse = np.inf
+                betahat = np.array([np.nan] * (p-1))
+                mse_all.append(mse)
+                beta_all.append(betahat)
+                logging.info(f"True Beta: " + str(beta_ilr_true))
+                logging.info(f"Estimated Beta: " + str())
+                logging.info(f"Error: " + str(np.round(mse, 2)))
+                logging.info(f"No solution for " + str(title))
 
         else:
             logging.info(f"Dirichlet not tried due to performance reasons")
@@ -243,7 +257,14 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
                 title_all.append(title)
                 logging.info(f"")
             except:
-                logging.info(f"No solution found for Dirichlet Regression")
+                mse = np.inf
+                betahat = np.array([np.nan] * (p-1))
+                mse_all.append(mse)
+                beta_all.append(betahat)
+                logging.info(f"True Beta: " + str(beta_ilr_true))
+                logging.info(f"Estimated Beta: " + str())
+                logging.info(f"Error: " + str(np.round(mse, 2)))
+                logging.info(f"No solution for " + str(title))
         else:
             logging.info(f"Dirichlet not tried due to performance reasons")
 
