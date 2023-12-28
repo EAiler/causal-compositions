@@ -179,7 +179,7 @@ def draw_tree(node_df, title="", agg_level="Class", tip_labels=True, save_path=N
                   )
 
     markers2 = [
-        (f"Only Second LC", toyplot.marker.create(shape="o", size=20, mstyle={"fill": "blue"})),
+        (f"Only LC", toyplot.marker.create(shape="o", size=20, mstyle={"fill": "blue"})),
         (f"ILR+LC", toyplot.marker.create(shape="o", size=20, mstyle={"fill": "orange"})),
         (f"Both Methods", toyplot.marker.create(shape="o", size=20, mstyle={"fill": "black"})),
         # (f"DIR+LC",toyplot.marker.create(shape="o", size=20, mstyle={"fill": "red"}))
