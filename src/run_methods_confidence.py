@@ -153,6 +153,7 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< No Compositional Constraint >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     if "NoComp" in method_selection:
         title = "NoComp"
+        title_all.append(title)
 
         try:
             betahat, Yhat = nocomp_regression(Z_sim, X_sim, Y_sim, X_star)
@@ -161,16 +162,13 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
             beta_all.append(V @ betahat[1:])
             logging.info(f"True Beta: " + str(beta_ilr_true))
             logging.info(f"Estimated Beta: " + str(np.round(betahat[1:], 2)))
-            logging.info(f"Error: " + str(np.round(mse, 2)))
-
-            title_all.append(title)
+            logging.info(f"Error: " + str(np.round(mse, 2)))   
             logging.info(f"")
         except:
             mse = np.inf
             betahat = np.array([np.nan] * (p-1))
             mse_all.append(mse)
             beta_all.append(betahat)
-            title_all.append(title)
             logging.info(f"True Beta: " + str(beta_ilr_true))
             logging.info(f"Estimated Beta: " + str())
             logging.info(f"Error: " + str(np.round(mse, 2)))
@@ -181,7 +179,7 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ONLY Second Stage - Log Contrast >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     if "OnlyLogContrast" in method_selection:
         title = "ONLY Second LC"
-
+        title_all.append(title)
         try:
             betahat, Yhat = noregression_logcontrast(Z_sim, X_sim, Y_sim, X_star,
                                                      logcontrast_threshold)
@@ -191,15 +189,12 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
             logging.info(f"True Beta: " + str(beta_ilr_true))
             logging.info(f"Estimated Beta: " + str(np.round(betahat[1:], 2)))
             logging.info(f"Error: " + str(np.round(mse, 2)))
-
-            title_all.append(title)
             logging.info(f"")
         except:
             mse = np.inf
             betahat = np.array([np.nan] * (p-1))
             mse_all.append(mse)
             beta_all.append(betahat)
-            title_all.append(title)
             logging.info(f"True Beta: " + str(beta_ilr_true))
             logging.info(f"Estimated Beta: " + str())
             logging.info(f"Error: " + str(np.round(mse, 2)))
@@ -212,6 +207,8 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 2SLS - Dirichlet + Log Contrast >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     if "DIR+LC" in method_selection:
         if p <= 30:
+            title = "DIR+LC"
+            title_all.append(title)
             try:
                 betahat, X_diri_log, Yhat = dirichlet_logcontrast(Z_sim, X_sim, Y_sim, X_star, mle, lambda_dirichlet,
                                                                   max_iter,
@@ -223,15 +220,14 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
                 logging.info(f"True Beta: " + str(beta_ilr_true))
                 logging.info(f"Estimated Beta: " + str(np.round(V @ betahat[1:], 2)))
                 logging.info(f"Error: " + str(np.round(mse, 2)))
-                title = "DIR+LC"
-                title_all.append(title)
+                
+                
                 logging.info(f"")
             except:
                 mse = np.inf
                 betahat = np.array([np.nan] * (p-1))
                 mse_all.append(mse)
                 beta_all.append(betahat)
-                title_all.append(title)
                 logging.info(f"True Beta: " + str(beta_ilr_true))
                 logging.info(f"Estimated Beta: " + str())
                 logging.info(f"Error: " + str(np.round(mse, 2)))
@@ -246,6 +242,8 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 2SLS - Dirichlet + Log Contrast >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     if "R_DIR+LC" in method_selection:
         if p <= 30:
+            title = "R_DIR+LC"
+            title_all.append(title)
             try:
                 betahat, X_diri_log, Yhat = r_dirichlet_logcontrast(Z_sim, X_sim, Y_sim, X_star,
                                                                   logcontrast_threshold)
@@ -256,15 +254,13 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
                 logging.info(f"True Beta: " + str(beta_ilr_true))
                 logging.info(f"Estimated Beta: " + str(np.round(V @ betahat[1:], 2)))
                 logging.info(f"Error: " + str(np.round(mse, 2)))
-                title = "R_DIR+LC"
-                title_all.append(title)
                 logging.info(f"")
             except:
                 mse = np.inf
                 betahat = np.array([np.nan] * (p-1))
                 mse_all.append(mse)
                 beta_all.append(betahat)
-                title_all.append(title)
+                
                 logging.info(f"True Beta: " + str(beta_ilr_true))
                 logging.info(f"Estimated Beta: " + str())
                 logging.info(f"Error: " + str(np.round(mse, 2)))
@@ -278,17 +274,31 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 2SLS - ILR + Log Contrast >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     # ILR REGRESSION LOG CONTRAST REGRESSION
     if "ILR+LC" in method_selection:
-        betahat, X_ilr_log, Yhat = ilr_logcontrast(Z_sim, X_sim, Y_sim, X_star,
-                                                   logcontrast_threshold)
-        mse = np.mean((Yhat - Y_star) ** 2)
-        mse_all.append(mse)
-        beta_all.append(V @ betahat[1:])
-        logging.info(f"True Beta: " + str(beta_ilr_true))
-        logging.info(f"Estimated Beta: " + str(np.round(betahat[1:], 2)))
-        logging.info(f"Error: " + str(np.round(mse, 2)))
         title = "ILR+LC"
         title_all.append(title)
-        logging.info(f"")
+
+        try:
+            betahat, X_ilr_log, Yhat = ilr_logcontrast(Z_sim, X_sim, Y_sim, X_star,
+                                                    logcontrast_threshold)
+            mse = np.mean((Yhat - Y_star) ** 2)
+            mse_all.append(mse)
+            beta_all.append(V @ betahat[1:])
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str(np.round(betahat[1:], 2)))
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            
+            logging.info(f"")
+        except:
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            logging.info(f"No solution for " + str(title))
+
 
     # ILR ILR REGRESSION
     #if "ILR+ILR" in method_selection:
@@ -296,93 +306,168 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 2SLS - ILR ILR Regression Implementation >>>>>>>>>>>>>>>>>>>>>>>")
     # ILR REGRESSION ILR REGRESSION
     if "ILR+ILR" in method_selection:
-        betahat, Yhat = ilr_ilr(Z_sim, X_sim, Y_sim, X_star)
-        mse = np.mean((Yhat - Y_star) ** 2)
-        mse_all.append(mse)
-        beta_all.append(V @ betahat[1:])
-        logging.info(f"True Beta: " + str(beta_ilr_true))
-        logging.info(f"Estimated Beta: " + str(np.round(V @ betahat[1:], 2)))
-        logging.info(f"Error: " + str(np.round(np.mean((Yhat - Y_star) ** 2), 2)))
+
         title = "ILR+ILR"
         title_all.append(title)
+
+        try:
+            betahat, Yhat = ilr_ilr(Z_sim, X_sim, Y_sim, X_star)
+            mse = np.mean((Yhat - Y_star) ** 2)
+            mse_all.append(mse)
+            beta_all.append(V @ betahat[1:])
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str(np.round(V @ betahat[1:], 2)))
+            logging.info(f"Error: " + str(np.round(np.mean((Yhat - Y_star) ** 2), 2)))
+        except:
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            logging.info(f"No solution for " + str(title))
+
+        
         logging.info(f"")
 
     logging.info(f"---------------------------------------------------------------------------------------------")
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< ALR MODEL>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     if "ALR+LC" in method_selection:
-        first_stage = ALR_Model()
-        first_stage.fit(X_sim, Z_sim)
-        Xhat_alr2 = first_stage.predict(Z_sim)
 
-        betahat, Yhat = noregression_logcontrast(Z_sim, Xhat_alr2, Y_sim, X_star,
-                                                 logcontrast_threshold)
-        mse = np.mean((Yhat - Y_star) ** 2)
-
-        mse_all.append(mse)
-        beta_all.append(V @ betahat[1:])
-        logging.info(f"True Beta: " + str(beta_ilr_true))
-        logging.info(f"Estimated Beta: " + str(np.round(V @ betahat[1:], 2)))
-        logging.info(f"Error: " + str(np.round(mse, 2)))
         title = "ALR+LC"
         title_all.append(title)
-        logging.info(f"")
+
+        try:
+            first_stage = ALR_Model()
+            first_stage.fit(X_sim, Z_sim)
+            Xhat_alr2 = first_stage.predict(Z_sim)
+
+            betahat, Yhat = noregression_logcontrast(Z_sim, Xhat_alr2, Y_sim, X_star,
+                                                    logcontrast_threshold)
+            mse = np.mean((Yhat - Y_star) ** 2)
+
+            mse_all.append(mse)
+            beta_all.append(V @ betahat[1:])
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str(np.round(V @ betahat[1:], 2)))
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            
+            logging.info(f"")
+        
+        except:
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            logging.info(f"No solution for " + str(title))
+
 
     logging.info(f"---------------------------------------------------------------------------------------------")
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 2SLS - Kernel Regression KIV >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     if "KIV" in method_selection:
 
-        _, Yhat = kiv.fit_kiv(ZZ, XX, YY, xstar=((X_star_ilr - mu_x) / std_x))
-        Yhat = std_y * Yhat + mu_y
-        mse = np.mean((Yhat - Y_star) ** 2)
-
-        mse_all.append(mse)
-        beta_all.append(None)
-        logging.info(f"Error: " + str(np.round(mse, 2)))
         title = "KIV"
         title_all.append(title)
-        logging.info(f"")
+
+        try:
+
+            _, Yhat = kiv.fit_kiv(ZZ, XX, YY, xstar=((X_star_ilr - mu_x) / std_x))
+            Yhat = std_y * Yhat + mu_y
+            mse = np.mean((Yhat - Y_star) ** 2)
+
+            mse_all.append(mse)
+            beta_all.append(None)
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            
+            logging.info(f"")
+        except:
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            logging.info(f"No solution for " + str(title))
 
 
     logging.info(f"---------------------------------------------------------------------------------------------")
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<< ONLY SECOND STAGE - Kernel Regression KIV >>>>>>>>>>>>>>>>>>>>>>>>>")
     if "OnlyKIV" in method_selection:
 
-        kernel = "linear"
-        from sklearn.kernel_ridge import KernelRidge
-        logging.info(f"We use {kernel_alpha}")
-        reg = KernelRidge(kernel=kernel, alpha=kernel_alpha).fit(XX, YY)
-        Yhat = reg.predict((X_star_ilr - mu_x) / std_x)
-        Yhat = std_y * Yhat + mu_y
-        mse = np.mean((Yhat - Y_star) ** 2)
-
-        mse_all.append(mse)
-        beta_all.append(None)
-        logging.info(f"Error: " + str(np.round(mse, 2)))
         title = "ONLY Second KIV"
         title_all.append(title)
-        logging.info(f"")
+
+        try:
+
+            kernel = "linear"
+            from sklearn.kernel_ridge import KernelRidge
+            logging.info(f"We use {kernel_alpha}")
+            reg = KernelRidge(kernel=kernel, alpha=kernel_alpha).fit(XX, YY)
+            Yhat = reg.predict((X_star_ilr - mu_x) / std_x)
+            Yhat = std_y * Yhat + mu_y
+            mse = np.mean((Yhat - Y_star) ** 2)
+
+            mse_all.append(mse)
+            beta_all.append(None)
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            
+            logging.info(f"")
+        
+        except:
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            logging.info(f"No solution for " + str(title))
 
 
     logging.info(f"---------------------------------------------------------------------------------------------")
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<< 2SLS - Kernel Regression KIV (manual) >>>>>>>>>>>>>>>>>>>>>>>>>")
     if "M_KIV" in method_selection:
-        from sklearn.kernel_ridge import KernelRidge
-        kernel = "linear"
-        reg = KernelRidge(kernel=kernel).fit(ZZ, XX)
-        Xhat_ilr = reg.predict(ZZ)
-        reg2 = KernelRidge(kernel=kernel, alpha=kernel_alpha).fit(Xhat_ilr, YY)
-        logging.info(f"We use {kernel_alpha}")
-        Yhat = reg2.predict((X_star_ilr - mu_x) / std_x)
-        Yhat = std_y * Yhat + mu_y
-        mse = np.mean((Yhat - Y_star) ** 2)
 
-        mse_all.append(mse)
-        beta_all.append(None)
-        logging.info(f"Error: " + str(np.round(mse, 2)))
         title = "Kernel+Kernel"
         title_all.append(title)
-        logging.info(f"")
 
+        try:
+            from sklearn.kernel_ridge import KernelRidge
+            kernel = "linear"
+            reg = KernelRidge(kernel=kernel).fit(ZZ, XX)
+            Xhat_ilr = reg.predict(ZZ)
+            reg2 = KernelRidge(kernel=kernel, alpha=kernel_alpha).fit(Xhat_ilr, YY)
+            logging.info(f"We use {kernel_alpha}")
+            Yhat = reg2.predict((X_star_ilr - mu_x) / std_x)
+            Yhat = std_y * Yhat + mu_y
+            mse = np.mean((Yhat - Y_star) ** 2)
+
+            mse_all.append(mse)
+            beta_all.append(None)
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            
+            logging.info(f"")
+
+        except:
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            logging.info(f"No solution for " + str(title))
+            
 
     if any(i > mse_large_threshold for i in mse_all[3:]):
         mse_large = {"X_sim": X_sim,
