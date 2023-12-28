@@ -11,7 +11,7 @@ from absl import flags
 
 flags.DEFINE_string("experiment_name", None,
                     "The name of the experiment (used for output folder).")
-flags.DEFINE_string("result_dir", "/home/haicu/elisabath.ailer/Projects/CausalComp/Output/",
+flags.DEFINE_string("result_dir", "/home/haicu/elisabath.ailer/Projects/CausalCompositions/causal-compositions/Output/",
                     "Base directory for all results.")
 flags.DEFINE_bool("gpu", True, "Whether to use GPUs.")
 
@@ -41,9 +41,9 @@ FLAGS = flags.FLAGS
 
 # Some values and paths to be set
 user = "elisabath.ailer"  # TODO : check that this is not elisabath.ailer (!!!) -> there were some mistakes made
-project = "CausalComp"
+project = "CausalCompositions"
 executable = f"/home/haicu/{user}/miniconda3/envs/comp_iv/bin/python"  # inserted the respective environment
-run_file = f"/home/haicu/{user}/Projects/{project}/src/run_methods_confidence.py"  # MAY NEED TO UPDATE THIS
+run_file = f"/home/haicu/{user}/Projects/{project}/causal-compositions/src/run_methods_confidence.py"  # MAY NEED TO UPDATE THIS
 
 
 # Specify the resource requirements *per run*
