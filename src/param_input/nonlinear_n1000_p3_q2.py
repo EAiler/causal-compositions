@@ -12,7 +12,7 @@ p=3
 num_inst=2
 
 # c_X = np.array([2, 2])  # dispersion parameter
-c_Y = np.array([2, -2])
+c_X = np.array([2, -2])
 
 # instrument strength
 alpha0 = np.array([1, 1])
