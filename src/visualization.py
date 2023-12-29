@@ -21,13 +21,15 @@ def plot_results(df_beta, df_mse, betaT, filter_list, sort_to_filter=True):
     fig1 = plot_mse_results(df_mse, filter_list, sort_to_filter=sort_to_filter)
     fig1.show()
 
+    filter_list_beta = [string for string in filter_list if string != "KIV(ILR)"]
+
     # Influential Beta Plot
-    fig2 = plot_beta_results(df_beta, V.T @ betaT, filter_list, sort_to_filter=sort_to_filter)
+    fig2 = plot_beta_results(df_beta, V.T @ betaT, filter_list_beta, sort_to_filter=sort_to_filter)
     fig2.update_layout(showlegend=False)
     fig2.show()
 
     # Non-influential Beta Plot
-    fig3 = plot_beta_results(df_beta, V.T @ betaT, filter_list, sort_to_filter=sort_to_filter, beta_zero=True)
+    fig3 = plot_beta_results(df_beta, V.T @ betaT, filter_list_beta, sort_to_filter=sort_to_filter, beta_zero=True)
     fig3.update_layout(showlegend=False)
     fig3.show()
 
@@ -39,6 +41,7 @@ def write_result_table(df_beta, df_mse, betaT):
     write results for result table
     """
 
+    
     p = len(df_beta.iloc[0, 1])  # get number of microbes
     V = cmp._gram_schmidt_basis(p)
 
@@ -64,6 +67,29 @@ def write_result_table(df_beta, df_mse, betaT):
     def false_zero_val(x):
         return (((x < eps) & (x > -eps)) & ((V.T @ betaT > eps) | (V.T @ betaT < -eps))).sum()
 
+    def count_nan_values(x):
+        return x.isna().sum()
+
+    def count_inf_values(x):
+        return x == np.inf
+
+    def drop_nan_rows(df, subset):
+        return df.replace([np.inf, -np.inf], np.nan).dropna(subset=[subset])
+
+    def drop_listnan_rows(df, subset):
+        return df[df[subset].apply(lambda x: not all(np.isnan(elem) for elem in x if isinstance(elem, float)))]
+
+
+    # Count Nan Values
+    #df_mse["Nan Values"] = count_inf_values(df_mse["MSE"])
+    df_mse["Inf Values"] = df_mse["MSE"].apply(count_inf_values)
+    df_mse["Inf Values"] = df_mse["Inf Values"].apply(lambda x: float(x))
+    df_mse_infs = df_mse.groupby("Method").agg({"Inf Values": [mean, std_err, "sum"]})
+
+    # delete Nan and Inf values
+    df_mse = drop_nan_rows(df_mse, subset="MSE")
+    #df_beta = drop_listnan_rows(df_beta, subset="Beta")
+
 
     # Prediction Error
     df_prediction_error = df_mse.groupby("Method").agg({"MSE": [mean, std_err]})
@@ -83,12 +109,17 @@ def write_result_table(df_beta, df_mse, betaT):
     df_beta["False Zero Values"] = df_beta["False Zero Values"].apply(lambda x: float(x))
     df_support_nonzeroval = df_beta.groupby("Method").agg({"False Zero Values": [mean, std_err]})
 
+
     res = {
         "df_prediction_error": df_prediction_error,
         "df_estimation_error": df_estimation_error,
         "df_support_zeroval": df_support_zeroval,
-        "df_support_nonzeroval": df_support_nonzeroval
+        "df_support_nonzeroval": df_support_nonzeroval,
+        "df_mse_infs": df_mse_infs
     }
+
+
+
     return res
 
 

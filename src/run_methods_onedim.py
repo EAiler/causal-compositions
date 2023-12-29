@@ -164,26 +164,6 @@ def main(_):
     n = Y.shape[0]
     Z = np.array([data["Treatment"][i].find("control") for i in range(n)]) * (-1)
 
-    # Simpson Diversity Alice
-    #X = data["Simpson"]     
-    #x, y, Ytrue, xstar, xstar_bound, ystar_ols, ystar_2sls, ystar_kiv, results = run_diversity_estimation_methods(Z,
-    #                                                                                                         X, Y)
-    #fig = plot_diversity_methods(x, y, xstar, xstar_bound, ystar_ols, ystar_2sls, ystar_kiv, results)
-    #fig.update_layout(xaxis=dict(title="Simpson Diversity (standardized)"), showlegend=False, width=1000, height=600)
-    #fig.update_yaxes(range=[-2.2, 2.2])
-    #fig.update_xaxes(range=[-3, 3])
-    #fig.write_image(os.path.join(FLAGS.save_path, FLAGS.agg_level + "_" + FLAGS.filter + "_simpson_div.png"))
-
-    # Shannon Diversity Alice
-    #X = data["Shannon"]
-    #x, y, Ytrue, xstar, xstar_bound, ystar_ols, ystar_2sls, ystar_kiv, results = run_diversity_estimation_methods(Z,
-     #                                                                                                             X, Y)
-    #fig = plot_diversity_methods(x, y, xstar, xstar_bound, ystar_ols, ystar_2sls, ystar_kiv, results)
-    #fig.update_layout(xaxis=dict(title="Shannon Diversity (standardized)"), showlegend=False, width=1000, height=600)
-    #fig.update_yaxes(range=[-2, 2])
-    #fig.update_xaxes(range=[-3, 3])
-    #fig.write_image(os.path.join(FLAGS.save_path, FLAGS.agg_level + "_" + FLAGS.filter + "_shannon_div.png"))
-
     # Chao Diversity SciKit Bio
     X = data.iloc[:, 5:-1]
     X = alpha_diversity("chao1", X)
