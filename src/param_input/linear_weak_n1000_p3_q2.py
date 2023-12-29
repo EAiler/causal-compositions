@@ -11,10 +11,13 @@ n = 1000
 p = 3
 num_inst = 2
 
-## Test 3
+## Test 3 SUPER!
 c_X = np.array([0.5, 0.5])  # dispersion parameter
 alpha0 = np.array([1, 1])
-alphaT = np.array([[+0.05, 0.01],
+#alphaT = np.array([[+0.05, 0.01],
+#                    [0.2, 0]])
+
+alphaT = np.array([[+0.15, 0.15],
                     [0.2, 0]])
 mu_c = -3
 beta0 = 5
