@@ -152,8 +152,9 @@ def get_k_matrix(x1: np.ndarray, x2: np.ndarray, v: float) -> np.ndarray:
     n = len(x2)
 
     if len(set(np.array(x1))) < 3:
-        v = 0.00001 #.001  # remove one zero, only was at 0.0001
+        v = 0.0001 #.001  # remove one zero, only was at 0.0001
     v = 1.0 #.001
+    v = 0.0001  # remove after simulation
 
     print("v", v)
 
