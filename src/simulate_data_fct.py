@@ -386,22 +386,27 @@ def sim_IV_ilr_nonlinear(key,
     Z_sim, X_sim, X_sim_ilr, confounder = sim_FS_ilr_linear(key, n, p, num_inst,
                                                             mu_c, alpha0, alphaT, c_X)
     # derive Y variable
-    #Y_sim = beta0 + 1/10*(X_sim_ilr @ betaT) + 1/20*((X_sim_ilr+1) ** 3 @ np.ones(p - 1, )) + c_Y * confounder.squeeze()
-
-    # Simulate Nonlinear Change
-    #Y_sim = beta0 + 1 / 5 * (X_sim_ilr @ betaT) + 1 / 10 * (
-            #(X_sim_ilr + 5) ** 3 @ np.ones(p - 1, )) + c_Y * confounder.squeeze()
-    # Simulate Nonlinear Change 4 - best so far
-    Y_sim = beta0 + 1 / 10 * ((X_sim_ilr + 1) ** 2 @ np.ones(p - 1, )) + c_Y * confounder.squeeze()
+    
+    def fct_nonlinear(beta0, X_sim_ilr, confounder, mu_c, do_confounder):
+        Y_sim = beta0 + 1/10*(X_sim_ilr @ betaT) + 1/20*((X_sim_ilr+1) ** 3 @ np.ones(p - 1, )) 
+        #Y_sim = beta0 + 1 / 5 * (X_sim_ilr @ betaT) + 1 / 10 * ((X_sim_ilr + 5) ** 3 @ np.ones(p - 1, )) 
+    
+        #Y_sim = beta0 + 1 / 10 * ((X_sim_ilr + 1) ** 2 @ np.ones(p - 1, ))
+        if do_confounder:
+             Y_sim += c_Y * confounder.squeeze()
+        else:
+            Y_sim += c_Y * mu_c
+        return Y_sim
+    
+    Y_sim = fct_nonlinear(beta0, X_sim_ilr, confounder, mu_c, True)
+    
     # compute intervention set up
     key, subkey = jax.random.split(key)
     _, X_star, X_star_ilr, _ = sim_FS_ilr_linear(key, num_star, p, num_inst,
                                                  mu_c, alpha0, alphaT, c_X)
 
-    #Y_star = beta0 + 1/10*(X_star_ilr @ betaT) + 1/20*((X_star_ilr+1) ** 3 @ np.ones(p - 1, )) + c_Y * mu_c
-    # best so far
-    Y_star = beta0 + 1 / 10 * ((X_star_ilr + 1) ** 2 @ np.ones(p - 1, )) + c_Y * mu_c
-
+    Y_star = fct_nonlinear(beta0, X_star_ilr, confounder, mu_c, False)
+    
     return confounder, Z_sim, X_sim, Y_sim, X_star, Y_star
 
 
