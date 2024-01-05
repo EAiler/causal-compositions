@@ -388,8 +388,8 @@ def sim_IV_ilr_nonlinear(key,
     # derive Y variable
     
     def fct_nonlinear(beta0, X_sim_ilr, confounder, mu_c, do_confounder):
-        Y_sim = beta0 + 1/10*(X_sim_ilr @ betaT) + 1/20*((X_sim_ilr+1) ** 3 @ np.ones(p - 1, )) 
-        #Y_sim = beta0 + 1 / 5 * (X_sim_ilr @ betaT) + 1 / 10 * ((X_sim_ilr + 5) ** 3 @ np.ones(p - 1, )) 
+        #Y_sim = beta0 + 1/10*(X_sim_ilr @ betaT) + 1/20*((X_sim_ilr+1) ** 3 @ np.ones(p - 1, )) 
+        Y_sim = beta0 + 1 / 5 * (X_sim_ilr @ betaT) + 1 / 10 * ((X_sim_ilr + 5) ** 3 @ np.ones(p - 1, )) 
     
         #Y_sim = beta0 + 1 / 10 * ((X_sim_ilr + 1) ** 2 @ np.ones(p - 1, ))
         if do_confounder:
