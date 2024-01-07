@@ -11,8 +11,8 @@ n=1000
 p=3
 num_inst=2
 
-#c_X = np.array([2, 2])  # dispersion parameter
-c_X = np.array([2, -2])
+c_X = np.array([2, 2])  # dispersion parameter
+# c_X = np.array([2, -2])
 
 # instrument strength
 alpha0 = np.array([1, 1])
@@ -29,5 +29,5 @@ beta0 = 5
 betaT = np.array([6, 2])
 
 # confounder influence to Y
-#c_Y = 4
-c_Y = 2
+c_Y = 4
+# c_Y = 2
