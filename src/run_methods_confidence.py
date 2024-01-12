@@ -54,10 +54,10 @@ flags.DEFINE_string("output_name", "",
 flags.DEFINE_integer("seed", 0, "The random seed.")
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string("paramfile", "paramFile_1", "name of python parameter file.")
-flags.DEFINE_integer("n", 10000, "sample number.")
-flags.DEFINE_integer("p", 10, "number of compositions/microbes.")
-flags.DEFINE_integer("num_inst", 10, "number of instruments.")
+flags.DEFINE_string("paramfile", "nonlinear_n1000_p3_q2", "name of python parameter file.")
+flags.DEFINE_integer("n", 1000, "sample number.")
+flags.DEFINE_integer("p", 3, "number of compositions/microbes.")
+flags.DEFINE_integer("num_inst", 2, "number of instruments.")
 flags.DEFINE_integer("num_star", 250, "number of interventional dataset.")
 flags.DEFINE_bool("use_data_in_folder", False, "Check if data is already available in the folder, if yes, then use the pickle files in the folder.")
 flags.DEFINE_string("add_id", "", "additional identifier, if pre-exisiting data is used, but other methods should be tested.")
@@ -65,12 +65,11 @@ flags.DEFINE_string("add_id", "", "additional identifier, if pre-exisiting data 
 
 flags.DEFINE_list("lambda_dirichlet", [0.1, 1, 2, 5, 10], "List of possible lambda parameters for the dirichlet regression.")
 flags.DEFINE_float("logcontrast_threshold", 0.7, "Threshold value for log contrast regression.")
-flags.DEFINE_float("kernel_alpha", 1, "Penalization parameter for KIV second stage.")
+flags.DEFINE_float("kernel_alpha", 0.01, "Penalization parameter for KIV second stage.")
 flags.DEFINE_integer("max_iter", 200, "Maximum number of iterations.")
-flags.DEFINE_list("selected_methods", ["OnlyLogContrast", "ILR+LogContrast", "R_DIR+LogContrast",
-                                       "DIR+LogContrast", "ILR+ILR"],
+flags.DEFINE_list("selected_methods", ["KIV", "KIV2", "M_KIV"],
                   "List of possible methods to evaluate the dataset for.")
-flags.DEFINE_integer("num_runs", 50, "Number of runs for confidence interval computation.")
+flags.DEFINE_integer("num_runs", 20, "Number of runs for confidence interval computation.")
 # local functions
 
 

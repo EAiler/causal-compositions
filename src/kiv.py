@@ -106,13 +106,14 @@ def get_k_multi_matrix(x1: np.ndarray, x2: np.ndarray, v: list, agg_method: str 
     x2 = x2[:, np.newaxis] if x2.ndim < 2 else x2  # enlarge array for being able to proceed computations
 
     for i in range(x1.shape[1]):
-        if agg_method == "product":
-            K_multi *= get_k_matrix(x1[:, i], x2[:, i], v[i])
-        if agg_method == "additive":
-            K_multi += get_k_matrix(x1[:, i], x2[:, i], v[i])
-        else:
-            # TODO : make this valid for callable
-            logging.warning("Specify multidimensional kernel function")
+        for j in range(x2.shape[1]):
+            if agg_method == "product":
+                K_multi *= get_k_matrix(x1[:, i], x2[:, j], v[i])
+            if agg_method == "additive":
+                K_multi += get_k_matrix(x1[:, i], x2[:, j], v[i])
+            else:
+                # TODO : make this valid for callable
+                logging.warning("Specify multidimensional kernel function")
     return K_multi
 
 
@@ -153,8 +154,8 @@ def get_k_matrix(x1: np.ndarray, x2: np.ndarray, v: float) -> np.ndarray:
 
     if len(set(np.array(x1))) < 3:
         v = 0.0001 #.001  
-    v = 1.0 #.001
-    v = 0.001
+    v = 10 #.001
+    #v = 0.001
     
     print("v", v)
 
