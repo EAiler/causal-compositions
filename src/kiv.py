@@ -86,7 +86,7 @@ def get_k(x: np.ndarray,
     return results
 
 
-def get_k_multi_matrix(x1: np.ndarray, x2: np.ndarray, v: list, agg_method: str = "additive") -> np.ndarray:
+def get_k_multi_matrix(x1: np.ndarray, x2: np.ndarray, v: list, agg_method: str = "product") -> np.ndarray:
     """ return multivariate kernel product matrix
 
     Parameters
@@ -155,9 +155,7 @@ def get_k_matrix(x1: np.ndarray, x2: np.ndarray, v: float) -> np.ndarray:
         v = 0.0001 #.001  
     v = 1.0 #.001
     v = 0.001
-    # Test 3
-    v = 0.0000001
-
+    
     print("v", v)
 
     x1 = np.repeat(x1[:, np.newaxis], n, 1)
