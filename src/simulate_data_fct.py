@@ -391,15 +391,12 @@ def sim_IV_ilr_nonlinear(key,
         #Y_sim = beta0 + 1/10*(X_sim_ilr @ betaT) + 1/20*((X_sim_ilr+1) ** 3 @ np.ones(p - 1, )) 
         # Y_sim = beta0 + 1 / 5 * (X_sim_ilr @ betaT) + 1 / 10 * ((X_sim_ilr + 5) ** 3 @ np.ones(p - 1, )) 
 
-        # Test 1
-        Y_sim = beta0 + 1 / 10*(X_sim_ilr @ betaT) + 1 / 10 * ((X_sim_ilr + 1) ** 5 @ np.ones(p - 1, ))
-
-        # Test 2
-        Y_sim = beta0 + 1 / 10*(X_sim_ilr @ betaT) + 1 / 25 * ((X_sim_ilr + 1) ** 5 @ np.ones(p - 1, ))
-
         # Test 3
         Y_sim = beta0 + 1/10*(X_sim_ilr @ betaT) + 1/20*((X_sim_ilr+1) ** 3 @ np.ones(p - 1, ))
-        
+
+        # Test 4
+        Y_sim = beta0 + 1/10*(X_sim_ilr @ betaT) + 1/10*((X_sim_ilr+1) ** 2 @ np.ones(p - 1, ))
+
         if do_confounder:
              Y_sim += c_Y * confounder.squeeze()
         else:
