@@ -397,6 +397,33 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
             logging.info(f"Error: " + str(np.round(mse, 2)))
             logging.info(f"No solution for " + str(title))
 
+    if "KIV2" in method_selection:
+
+        title = "KIV"
+        title_all.append(title)
+
+        try:
+
+            _, Yhat = kiv.fit_kiv(ZZ, XX, YY, xstar=((X_star_ilr - mu_x) / std_x), fix_hyper=True, lambda_guess=.00001, xi_guess=.00001)
+            Yhat = std_y * Yhat + mu_y
+            mse = np.mean((Yhat - Y_star) ** 2)
+
+            mse_all.append(mse)
+            beta_all.append(None)
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            
+            logging.info(f"")
+        except:
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            logging.info(f"No solution for " + str(title))
+
 
     logging.info(f"---------------------------------------------------------------------------------------------")
     logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<< ONLY SECOND STAGE - Kernel Regression KIV >>>>>>>>>>>>>>>>>>>>>>>>>")
