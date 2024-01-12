@@ -404,7 +404,7 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
 
         try:
 
-            _, Yhat = kiv.fit_kiv(ZZ, XX, YY, xstar=((X_star_ilr - mu_x) / std_x), fix_hyper=True, lambda_guess=.00001, xi_guess=.00001)
+            _, Yhat = kiv.fit_kiv(ZZ, XX, YY, xstar=((X_star_ilr - mu_x) / std_x), fix_hyper=True, lambda_guess=kernel_alpha, xi_guess=kernel_alpha)
             Yhat = std_y * Yhat + mu_y
             mse = np.mean((Yhat - Y_star) ** 2)
 
