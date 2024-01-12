@@ -476,6 +476,48 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
                      "Y_star": Y_star}
     else:
         mse_large = None
+    
+    if "M_KIV_rbf" in method_selection:
+
+        title = "KIV(ILR)_rbf"
+        title_all.append(title)
+
+        try:
+            from sklearn.kernel_ridge import KernelRidge
+            kernel = "rbf"
+            reg = KernelRidge(kernel=kernel).fit(ZZ, XX)
+            Xhat_ilr = reg.predict(ZZ)
+            reg2 = KernelRidge(kernel=kernel, alpha=kernel_alpha).fit(Xhat_ilr, YY)
+            logging.info(f"We use {kernel_alpha}")
+            Yhat = reg2.predict((X_star_ilr - mu_x) / std_x)
+            Yhat = std_y * Yhat + mu_y
+            mse = np.mean((Yhat - Y_star) ** 2)
+
+            mse_all.append(mse)
+            beta_all.append(None)
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            
+            logging.info(f"")
+
+        except:
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            logging.info(f"No solution for " + str(title))
+            
+
+    if any(i > mse_large_threshold for i in mse_all[3:]):
+        mse_large = {"X_sim": X_sim,
+                     "Y_sim": Y_sim,
+                     "X_star": X_star,
+                     "Y_star": Y_star}
+    else:
+        mse_large = None
 
     return mse_all, beta_all, title_all, mse_large
 
