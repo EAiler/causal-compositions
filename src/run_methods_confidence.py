@@ -25,6 +25,8 @@ import dirichlet
 import statsmodels.api as sm
 from statsmodels.sandbox.regression.gmm import IV2SLS
 import skbio.stats.composition as cmp
+from sklearn.model_selection import train_test_split
+
 import sys
 sys.path.append(os.getcwd())
 sys.path.append(os.path.join(os.getcwd(), "param_input"))
@@ -32,6 +34,8 @@ sys.path.append(os.path.join(os.getcwd(), "param_input"))
 
 import boundiv
 import kiv
+
+from kernelIV import kiv as kiv_high
 from method_fct import noregression_logcontrast, dirichlet_logcontrast, ilr_logcontrast, ALR_Model
 from method_fct import ilr_ilr, r_dirichlet_logcontrast, nocomp_regression
 from simulate_data_fct import sim_IV_negbinomial, sim_IV_ilr_linear, sim_IV_ilr_nonlinear
@@ -65,9 +69,9 @@ flags.DEFINE_string("add_id", "", "additional identifier, if pre-exisiting data 
 
 flags.DEFINE_list("lambda_dirichlet", [0.1, 1, 2, 5, 10], "List of possible lambda parameters for the dirichlet regression.")
 flags.DEFINE_float("logcontrast_threshold", 0.7, "Threshold value for log contrast regression.")
-flags.DEFINE_float("kernel_alpha", 0.01, "Penalization parameter for KIV second stage.")
+flags.DEFINE_float("kernel_alpha", 0.0001, "Penalization parameter for KIV second stage.")
 flags.DEFINE_integer("max_iter", 200, "Maximum number of iterations.")
-flags.DEFINE_list("selected_methods", ["KIV", "KIV2", "M_KIV"],
+flags.DEFINE_list("selected_methods", ["ILR+LC","KIV", "KIV2", "M_KIV", "KIV_High"],
                   "List of possible methods to evaluate the dataset for.")
 flags.DEFINE_integer("num_runs", 20, "Number of runs for confidence interval computation.")
 # local functions
@@ -404,6 +408,35 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
         try:
 
             _, Yhat = kiv.fit_kiv(ZZ, XX, YY, xstar=((X_star_ilr - mu_x) / std_x), fix_hyper=True, lambda_guess=kernel_alpha, xi_guess=kernel_alpha)
+            Yhat = std_y * Yhat + mu_y
+            mse = np.mean((Yhat - Y_star) ** 2)
+
+            mse_all.append(mse)
+            beta_all.append(None)
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            
+            logging.info(f"")
+        except:
+            mse = np.inf
+            betahat = np.array([np.nan] * (p-1))
+            mse_all.append(mse)
+            beta_all.append(betahat)
+            
+            logging.info(f"True Beta: " + str(beta_ilr_true))
+            logging.info(f"Estimated Beta: " + str())
+            logging.info(f"Error: " + str(np.round(mse, 2)))
+            logging.info(f"No solution for " + str(title))
+    
+    if "KIV_High" in method_selection:
+
+        title = "KIV_High"
+        title_all.append(title)
+
+        try:
+            Z, Ztilde, X, X_tilde, Y, Ytilde = train_test_split(ZZ, XX, YY, test_size=0.5, random_state=42)
+            _, f_est = kiv_high(Z, X, Ztilde, Ytilde, kernel_alpha, kernel_alpha)
+            xstar = ((X_star_ilr - mu_x) / std_x)
+            Yhat = f_est(xstar)
             Yhat = std_y * Yhat + mu_y
             mse = np.mean((Yhat - Y_star) ** 2)
 

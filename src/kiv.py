@@ -154,7 +154,7 @@ def get_k_matrix(x1: np.ndarray, x2: np.ndarray, v: float) -> np.ndarray:
 
     if len(set(np.array(x1))) < 3:
         v = 0.0001 #.001  
-    v = 10 #.001
+    v = 15 #.001
     #v = 0.001
     
     print("v", v)
