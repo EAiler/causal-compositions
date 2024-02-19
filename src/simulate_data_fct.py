@@ -396,6 +396,7 @@ def sim_IV_ilr_nonlinear(key,
 
         # Test 4
         #Y_sim = beta0 + 1/10*(X_sim_ilr @ betaT) + 1/10*((X_sim_ilr+1) ** 2 @ np.ones(p - 1, ))
+        Y_sim = beta0 + 1/100*((X_sim_ilr+1) ** 3 @ np.ones(p - 1, )) + (np.sin(X_sim_ilr) @ np.ones(p - 1, )*10)
 
         if do_confounder:
              Y_sim += c_Y * confounder.squeeze()

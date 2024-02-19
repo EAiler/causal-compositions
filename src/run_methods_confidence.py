@@ -48,7 +48,7 @@ Results = Dict[Text, Union[float, np.ndarray]]
 # I always keep those the same!
 flags.DEFINE_string("data_dir", "../param_input/",
                     "Directory of the input data.")
-flags.DEFINE_string("output_dir", "../results/",
+flags.DEFINE_string("output_dir", "../Output/",
                     "Path to the output directory (for results).")
 flags.DEFINE_string("output_name", "",
                     "Name for result folder. Use timestamp if empty.")
@@ -71,9 +71,9 @@ flags.DEFINE_list("lambda_dirichlet", [0.1, 1, 2, 5, 10], "List of possible lamb
 flags.DEFINE_float("logcontrast_threshold", 0.7, "Threshold value for log contrast regression.")
 flags.DEFINE_float("kernel_alpha", 0.0001, "Penalization parameter for KIV second stage.")
 flags.DEFINE_integer("max_iter", 200, "Maximum number of iterations.")
-flags.DEFINE_list("selected_methods", ["ILR+LC","KIV", "KIV2", "M_KIV", "KIV_High"],
+flags.DEFINE_list("selected_methods", ["ILR+LC","KIV_High","OnlyLogContrast","DIR+LC","ALR+LC","ILR+ILR","NoComp"],
                   "List of possible methods to evaluate the dataset for.")
-flags.DEFINE_integer("num_runs", 20, "Number of runs for confidence interval computation.")
+flags.DEFINE_integer("num_runs", 50, "Number of runs for confidence interval computation.")
 # local functions
 
 
@@ -125,6 +125,9 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
     mse_all = []
     title_all = []
     beta_all = []
+    Y_all = []
+    Ka_best = []
+    Gamma_best = []
 
     # estimate starting point for dirichlet regression
     if p < 10:
@@ -426,35 +429,46 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
             logging.info(f"Estimated Beta: " + str())
             logging.info(f"Error: " + str(np.round(mse, 2)))
             logging.info(f"No solution for " + str(title))
+
+
+    logging.info(f"---------------------------------------------------------------------------------------------")
+    logging.info(f"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 2SLS - Kernel Regression KIV High Dim >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     
     if "KIV_High" in method_selection:
 
         title = "KIV_High"
         title_all.append(title)
+        mse_best = 100000
 
-        try:
-            Z, Ztilde, X, X_tilde, Y, Ytilde = train_test_split(ZZ, XX, YY, test_size=0.5, random_state=42)
-            _, f_est = kiv_high(Z, X, Ztilde, Ytilde, kernel_alpha, kernel_alpha)
-            xstar = ((X_star_ilr - mu_x) / std_x)
-            Yhat = f_est(xstar)
-            Yhat = std_y * Yhat + mu_y
-            mse = np.mean((Yhat - Y_star) ** 2)
+        #try:
+        for ka in [0.1]: #[1.0, 0.1, 0.01, 0.001, 0.0001, 0.00001]:
+            for gamma in [0.5]: #[0.5, 1.0, 2.0, 10.0, 15.0, 20.0, 30.0, 100.0]:
+                Z, Ztilde, X, X_tilde, Y, Ytilde = train_test_split(ZZ, XX, YY, test_size=0.5, random_state=42)
+                _, f_est = kiv_high(Z, X, Ztilde, Ytilde, ka, ka, gamma)
+                xstar = ((X_star_ilr - mu_x) / std_x)
+                Yest = f_est(xstar)
+                Yest = std_y * Yest + mu_y
+                mse_est = np.mean((Yest - Y_star) ** 2)
 
-            mse_all.append(mse)
-            beta_all.append(None)
-            logging.info(f"Error: " + str(np.round(mse, 2)))
-            
-            logging.info(f"")
-        except:
-            mse = np.inf
-            betahat = np.array([np.nan] * (p-1))
-            mse_all.append(mse)
-            beta_all.append(betahat)
-            
-            logging.info(f"True Beta: " + str(beta_ilr_true))
-            logging.info(f"Estimated Beta: " + str())
-            logging.info(f"Error: " + str(np.round(mse, 2)))
-            logging.info(f"No solution for " + str(title))
+                if mse_est < mse_best:
+                    mse_best = mse_est
+                    mse = mse_est
+                    Yhat = Yest
+                    ka_best = ka
+                    gamma_best = gamma
+                    print("..............................")
+                    print(ka)
+                    print(gamma)
+
+        mse_all.append(mse)
+        beta_all.append(None)
+        Y_all.append(Yhat)
+        Ka_best.append(ka_best)
+        Gamma_best.append(gamma_best)
+
+        logging.info(f"Error: " + str(np.round(mse, 2)))
+        
+        logging.info(f"")
 
 
     logging.info(f"---------------------------------------------------------------------------------------------")
@@ -536,7 +550,7 @@ def run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, beta_ilr_true,
     else:
         mse_large = None
 
-    return mse_all, beta_all, title_all, mse_large
+    return mse_all, beta_all, title_all, mse_large, Y_all, Ka_best, Gamma_best
 
 # =============================================================================
 # MAIN
@@ -584,6 +598,9 @@ def main(_):
     title_confidence = []
     beta_confidence = []
     mse_large_confidence = {}
+    Y_all_confidence = {}
+    Ka_best_confidence = []
+    Gamma_best_confidence = []
 
     subkey, _ = jax.random.split(param.key, 2)
 
@@ -777,7 +794,7 @@ def main(_):
         # 3. Perform Method computations
         # ---------------------------------------------------------------------------
         logging.info(f"Start method computation.")
-        mse_all, beta_all, title_all, mse_large = run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, betaT,
+        mse_all, beta_all, title_all, mse_large, Y_all, Ka_best, Gamma_best = run_methods_selection(Z_sim, X_sim, Y_sim, X_star, Y_star, betaT,
                                                                   FLAGS.lambda_dirichlet,
                                                                   FLAGS.max_iter,
                                                                   FLAGS.logcontrast_threshold,
@@ -789,6 +806,9 @@ def main(_):
         mse_confidence.append(mse_all)
         title_confidence.append(title_all)
         mse_large_confidence.update({iter: mse_large})
+        Y_all_confidence.update({iter: Y_all})
+        Ka_best_confidence.append(Ka_best)
+        Gamma_best_confidence.append(Gamma_best)
 
 
         # ---------------------------------------------------------------------------
@@ -831,7 +851,10 @@ def main(_):
             "betaT": betaT,
             "beta_all": beta_all,
             "mse_all": mse_all,
-            "title_all": title_all
+            "title_all": title_all,
+            "y_all": Y_all_confidence,
+            "ka_best": Ka_best_confidence,
+            "gamma_best": Gamma_best_confidence
         }
 
         # ---------------------------------------------------------------------------
